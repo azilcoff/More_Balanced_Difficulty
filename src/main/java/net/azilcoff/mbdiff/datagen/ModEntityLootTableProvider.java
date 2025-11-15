@@ -1,4 +1,4 @@
-package net.azilcoff.datagen;
+package net.azilcoff.mbdiff.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricEntityLootTableProvider;
@@ -24,7 +24,7 @@ public class ModEntityLootTableProvider extends FabricEntityLootTableProvider {
         this.register(EntityType.EVOKER, LootTable.builder()
                 .pool(LootPool.builder()
                         .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .conditionally(RandomChanceLootCondition.builder(0.001F))
+                        .conditionally(RandomChanceLootCondition.builder(0.6F))
                         .with(ItemEntry.builder(Items.EMERALD_BLOCK)
                                 .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0F))))
                 ));
