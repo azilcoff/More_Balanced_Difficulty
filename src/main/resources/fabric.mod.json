@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "mbdiff",
+	"version": "${version}",
+	"name": "More Balanced Difficulty",
+	"description": "Makes the game's mechanics more fair for a better balanced game difficulty",
+	"authors": [
+		"azilcoff"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/mbdiff/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.azilcoff.mbdiff.MoreBalancedDifficulty"
+		],
+        "client": [
+            "net.azilcoff.mbdiff.MoreBalancedDifficultyClient"
+        ],
+		"fabric-datagen": [
+			"net.azilcoff.mbdiff.MoreBalancedDifficultyDataGenerator"
+		]
+	},
+	"mixins": [
+		"mbdiff.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
