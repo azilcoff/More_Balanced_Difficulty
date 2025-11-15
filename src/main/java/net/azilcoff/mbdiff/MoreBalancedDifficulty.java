@@ -7,7 +7,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.SpawnRestriction;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -227,11 +226,11 @@ public class MoreBalancedDifficulty implements ModInitializer {
                 hostileEntity.setEquipmentDropChance(EquipmentSlot.LEGS, 0);
                 hostileEntity.setEquipmentDropChance(EquipmentSlot.FEET, 0);
 
-                if (pullChance(serverWorld, 50)) hostileEntity.equipStack(EquipmentSlot.MAINHAND, getRandomEquipmentPiece(serverWorld, EquipmentSlot.MAINHAND, hostileEntity));
+                if (pullChance(serverWorld, 28)) hostileEntity.equipStack(EquipmentSlot.MAINHAND, getRandomEquipmentPiece(serverWorld, EquipmentSlot.MAINHAND, hostileEntity));
                 if (pullChance(serverWorld, 66)) hostileEntity.equipStack(EquipmentSlot.HEAD, getRandomEquipmentPiece(serverWorld, EquipmentSlot.HEAD, hostileEntity));
-                if (pullChance(serverWorld, 34)) hostileEntity.equipStack(EquipmentSlot.CHEST, getRandomEquipmentPiece(serverWorld, EquipmentSlot.CHEST, hostileEntity));
-                if (pullChance(serverWorld, 57)) hostileEntity.equipStack(EquipmentSlot.LEGS, getRandomEquipmentPiece(serverWorld, EquipmentSlot.LEGS, hostileEntity));
-                if (pullChance(serverWorld, 62)) hostileEntity.equipStack(EquipmentSlot.FEET, getRandomEquipmentPiece(serverWorld, EquipmentSlot.FEET, hostileEntity));
+                if (pullChance(serverWorld, 15)) hostileEntity.equipStack(EquipmentSlot.CHEST, getRandomEquipmentPiece(serverWorld, EquipmentSlot.CHEST, hostileEntity));
+                if (pullChance(serverWorld, 34)) hostileEntity.equipStack(EquipmentSlot.LEGS, getRandomEquipmentPiece(serverWorld, EquipmentSlot.LEGS, hostileEntity));
+                if (pullChance(serverWorld, 48)) hostileEntity.equipStack(EquipmentSlot.FEET, getRandomEquipmentPiece(serverWorld, EquipmentSlot.FEET, hostileEntity));
             }
         });
 	}
