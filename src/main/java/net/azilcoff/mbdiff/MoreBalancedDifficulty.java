@@ -7,7 +7,8 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnRestriction;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -47,7 +48,9 @@ public class MoreBalancedDifficulty implements ModInitializer {
             EntityType.DROWNED,
             EntityType.HUSK,
             EntityType.SKELETON,
+            EntityType.WITHER_SKELETON,
             EntityType.STRAY,
+            EntityType.BOGGED,
             EntityType.PILLAGER,
             EntityType.VINDICATOR,
             EntityType.EVOKER,
@@ -158,7 +161,7 @@ public class MoreBalancedDifficulty implements ModInitializer {
     }
 
 
-    private static ItemStack getRandomEquipmentPiece(ServerWorld world, EquipmentSlot slot, LivingEntity livingEntity){
+    private static ItemStack getRandomEquipmentPiece(ServerWorld world, EquipmentSlot slot, HostileEntity hostileEntity){
         if (slot != EquipmentSlot.MAINHAND){
             ArmorMaterial material;
 
@@ -171,7 +174,7 @@ public class MoreBalancedDifficulty implements ModInitializer {
 
             ItemStack armorPiece = ARMOR_BY_MATERIAL.get(material).get(slot).getDefaultStack();
 
-            armorPiece.damage(getPercentageOf(armorPiece.getMaxDamage(), world.random.nextBetween(60,80)), livingEntity, slot);
+            armorPiece.damage(getPercentageOf(armorPiece.getMaxDamage(), world.random.nextBetween(60,80)), hostileEntity, slot);
 
             if (pullChance(world, 15)){
                 float enchantChance = 25;
@@ -197,15 +200,15 @@ public class MoreBalancedDifficulty implements ModInitializer {
 
             ItemStack sword = SWORDS_BY_MATERIAL.get(material).getDefaultStack();
 
-            sword.damage(getPercentageOf(sword.getMaxDamage(), world.random.nextBetween(60,80)), livingEntity, slot);
+            sword.damage(getPercentageOf(sword.getMaxDamage(), world.random.nextBetween(60,80)), hostileEntity, slot);
 
             if (pullChance(world, 15)){
                 float enchantChance = 25;
-                int i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size());
+                int i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size()-1);
                 do{
                     sword.addEnchantment(getEntryFromKey(ENCHANTMENTS_BY_SLOT.get(slot).get(i), world), 1);
 
-                    i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size());
+                    i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size()-1);
                     enchantChance /= 2;
                 }while (pullChance(world, Math.round(enchantChance)));
             }
@@ -217,13 +220,18 @@ public class MoreBalancedDifficulty implements ModInitializer {
 	@Override
 	public void onInitialize() {
         ServerEntityEvents.ENTITY_LOAD.register((entity, serverWorld) -> {
-            if (entity instanceof LivingEntity livingEntity && HOSTILE_EQUIPPABLE_ENTITIES.contains(livingEntity.getType())){
-                if (pullChance(serverWorld, 75)) livingEntity.equipStack(EquipmentSlot.MAINHAND, getRandomEquipmentPiece(serverWorld, EquipmentSlot.MAINHAND, livingEntity));
+            if (entity instanceof HostileEntity hostileEntity && HOSTILE_EQUIPPABLE_ENTITIES.contains(hostileEntity.getType())){
+                hostileEntity.setEquipmentDropChance(EquipmentSlot.MAINHAND, 0);
+                hostileEntity.setEquipmentDropChance(EquipmentSlot.HEAD, 0);
+                hostileEntity.setEquipmentDropChance(EquipmentSlot.CHEST, 0);
+                hostileEntity.setEquipmentDropChance(EquipmentSlot.LEGS, 0);
+                hostileEntity.setEquipmentDropChance(EquipmentSlot.FEET, 0);
 
-                if (pullChance(serverWorld, 80)) livingEntity.equipStack(EquipmentSlot.HEAD, getRandomEquipmentPiece(serverWorld, EquipmentSlot.HEAD, livingEntity));
-                if (pullChance(serverWorld, 34)) livingEntity.equipStack(EquipmentSlot.CHEST, getRandomEquipmentPiece(serverWorld, EquipmentSlot.CHEST, livingEntity));
-                if (pullChance(serverWorld, 57)) livingEntity.equipStack(EquipmentSlot.LEGS, getRandomEquipmentPiece(serverWorld, EquipmentSlot.LEGS, livingEntity));
-                if (pullChance(serverWorld, 62)) livingEntity.equipStack(EquipmentSlot.FEET, getRandomEquipmentPiece(serverWorld, EquipmentSlot.FEET, livingEntity));
+                if (pullChance(serverWorld, 50)) hostileEntity.equipStack(EquipmentSlot.MAINHAND, getRandomEquipmentPiece(serverWorld, EquipmentSlot.MAINHAND, hostileEntity));
+                if (pullChance(serverWorld, 66)) hostileEntity.equipStack(EquipmentSlot.HEAD, getRandomEquipmentPiece(serverWorld, EquipmentSlot.HEAD, hostileEntity));
+                if (pullChance(serverWorld, 34)) hostileEntity.equipStack(EquipmentSlot.CHEST, getRandomEquipmentPiece(serverWorld, EquipmentSlot.CHEST, hostileEntity));
+                if (pullChance(serverWorld, 57)) hostileEntity.equipStack(EquipmentSlot.LEGS, getRandomEquipmentPiece(serverWorld, EquipmentSlot.LEGS, hostileEntity));
+                if (pullChance(serverWorld, 62)) hostileEntity.equipStack(EquipmentSlot.FEET, getRandomEquipmentPiece(serverWorld, EquipmentSlot.FEET, hostileEntity));
             }
         });
 	}
