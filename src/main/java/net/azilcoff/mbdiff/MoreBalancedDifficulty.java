@@ -18,6 +18,8 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +86,12 @@ public class MoreBalancedDifficulty implements ModInitializer {
                     EquipmentSlot.LEGS, Items.DIAMOND_LEGGINGS,
                     EquipmentSlot.FEET, Items.DIAMOND_BOOTS
             ),
+            ArmorMaterials.CHAIN, Map.of(
+                    EquipmentSlot.HEAD, Items.CHAINMAIL_HELMET,
+                    EquipmentSlot.CHEST, Items.CHAINMAIL_CHESTPLATE,
+                    EquipmentSlot.LEGS, Items.CHAINMAIL_LEGGINGS,
+                    EquipmentSlot.FEET, Items.CHAINMAIL_BOOTS
+            ),
             ArmorMaterials.NETHERITE, Map.of(
                     EquipmentSlot.HEAD, Items.NETHERITE_HELMET,
                     EquipmentSlot.CHEST, Items.NETHERITE_CHESTPLATE,
@@ -108,22 +116,18 @@ public class MoreBalancedDifficulty implements ModInitializer {
             ToolMaterial.COPPER, Items.COPPER_SWORD
     );
 
-    private static final Map<EquipmentSlot, List<RegistryKey<Enchantment>>> ENCHANTMENTS_BY_SLOT = Map.of(
+    private static final Map<EquipmentSlot, List<RegistryKey<Enchantment>>> ENCHANTMENTS_BY_ARMOR_SLOT = Map.of(
             EquipmentSlot.HEAD, List.of(
                     Enchantments.PROTECTION,
                     Enchantments.FIRE_PROTECTION,
                     Enchantments.BLAST_PROTECTION,
-                    Enchantments.PROJECTILE_PROTECTION,
-                    Enchantments.RESPIRATION,
-                    Enchantments.AQUA_AFFINITY,
-                    Enchantments.THORNS
+                    Enchantments.PROJECTILE_PROTECTION
             ),
             EquipmentSlot.CHEST, List.of(
                     Enchantments.PROTECTION,
                     Enchantments.FIRE_PROTECTION,
                     Enchantments.BLAST_PROTECTION,
-                    Enchantments.PROJECTILE_PROTECTION,
-                    Enchantments.THORNS
+                    Enchantments.PROJECTILE_PROTECTION
             ),
             EquipmentSlot.LEGS, List.of(
                     Enchantments.PROTECTION,
@@ -136,21 +140,19 @@ public class MoreBalancedDifficulty implements ModInitializer {
                     Enchantments.FIRE_PROTECTION,
                     Enchantments.BLAST_PROTECTION,
                     Enchantments.PROJECTILE_PROTECTION,
-                    Enchantments.FEATHER_FALLING,
-                    Enchantments.DEPTH_STRIDER,
                     Enchantments.FROST_WALKER
-            ),
-            EquipmentSlot.MAINHAND, List.of(
+            )
+    );
+
+    private static final Map<TagKey<Item>, List<RegistryKey<Enchantment>>> ENCHANTMENT_BY_WEAPON = Map.of(
+            ItemTags.SWORD_ENCHANTABLE, List.of(
                     Enchantments.SHARPNESS,
-                    Enchantments.SMITE,
-                    Enchantments.BANE_OF_ARTHROPODS,
-                    Enchantments.KNOCKBACK,
-                    Enchantments.FIRE_ASPECT,
-                    Enchantments.LOOTING,
-                    Enchantments.SWEEPING_EDGE,
-                    Enchantments.UNBREAKING,
-                    Enchantments.MENDING,
-                    Enchantments.VANISHING_CURSE
+                    Enchantments.KNOCKBACK
+            ),
+            ItemTags.BOW_ENCHANTABLE, List.of(
+                    Enchantments.POWER,
+                    Enchantments.PUNCH,
+                    Enchantments.FLAME
             )
     );
 
@@ -175,21 +177,22 @@ public class MoreBalancedDifficulty implements ModInitializer {
 
             armorPiece.damage(getPercentageOf(armorPiece.getMaxDamage(), world.random.nextBetween(60,80)), hostileEntity, slot);
 
-            if (pullChance(world, 15)){
+            if (pullChance(world, 23)){
                 float enchantChance = 25;
-                int i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size()-1);
+                int i = world.random.nextBetween(0, ENCHANTMENTS_BY_ARMOR_SLOT.get(slot).size()-1);
                 do{
-                    armorPiece.addEnchantment(getEntryFromKey(ENCHANTMENTS_BY_SLOT.get(slot).get(i), world), 1);
+                    armorPiece.addEnchantment(getEntryFromKey(ENCHANTMENTS_BY_ARMOR_SLOT.get(slot).get(i), world), 1);
 
-                    i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size()-1);
+                    i = world.random.nextBetween(0, ENCHANTMENTS_BY_ARMOR_SLOT.get(slot).size()-1);
                     enchantChance /= 2;
                 }while (pullChance(world, Math.round(enchantChance)));
             }
 
             return armorPiece;
         }
-        else{
+        else {
             ToolMaterial material;
+            TagKey<Item> mainHandItemTag = hostileEntity.getMainHandStack().streamTags().filter(ENCHANTMENT_BY_WEAPON::containsKey).toList().getFirst();
 
             if (pullChance(world, 1)) material = ToolMaterial.NETHERITE;
             else if (pullChance(world, 3)) material = ToolMaterial.DIAMOND;
@@ -201,13 +204,13 @@ public class MoreBalancedDifficulty implements ModInitializer {
 
             sword.damage(getPercentageOf(sword.getMaxDamage(), world.random.nextBetween(60,80)), hostileEntity, slot);
 
-            if (pullChance(world, 15)){
+            if (pullChance(world, 23)){
                 float enchantChance = 25;
-                int i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size()-1);
+                int i = world.random.nextBetween(0, ENCHANTMENT_BY_WEAPON.get(mainHandItemTag).size()-1);
                 do{
-                    sword.addEnchantment(getEntryFromKey(ENCHANTMENTS_BY_SLOT.get(slot).get(i), world), 1);
+                    sword.addEnchantment(getEntryFromKey(ENCHANTMENT_BY_WEAPON.get(mainHandItemTag).get(i), world), 1);
 
-                    i = world.random.nextBetween(0, ENCHANTMENTS_BY_SLOT.get(slot).size()-1);
+                    i = world.random.nextBetween(0, ENCHANTMENT_BY_WEAPON.get(mainHandItemTag).size()-1);
                     enchantChance /= 2;
                 }while (pullChance(world, Math.round(enchantChance)));
             }
@@ -225,6 +228,21 @@ public class MoreBalancedDifficulty implements ModInitializer {
                 hostileEntity.setEquipmentDropChance(EquipmentSlot.CHEST, 0);
                 hostileEntity.setEquipmentDropChance(EquipmentSlot.LEGS, 0);
                 hostileEntity.setEquipmentDropChance(EquipmentSlot.FEET, 0);
+
+                if (hostileEntity.getMainHandStack().streamTags().anyMatch(ENCHANTMENT_BY_WEAPON::containsKey)){
+                    TagKey<Item> mainHandItemTag = hostileEntity.getMainHandStack().streamTags().filter(ENCHANTMENT_BY_WEAPON::containsKey).toList().getFirst();
+
+                    if (pullChance(serverWorld, 15)){
+                        float enchantChance = 25;
+                        int i = serverWorld.random.nextBetween(0, ENCHANTMENT_BY_WEAPON.get(mainHandItemTag).size()-1);
+                        do{
+                            hostileEntity.getMainHandStack().addEnchantment(getEntryFromKey(ENCHANTMENT_BY_WEAPON.get(mainHandItemTag).get(i), serverWorld), 1);
+
+                            i = serverWorld.random.nextBetween(0, ENCHANTMENT_BY_WEAPON.get(mainHandItemTag).size()-1);
+                            enchantChance /= 2;
+                        }while (pullChance(serverWorld, Math.round(enchantChance)));
+                    }
+                }
 
                 if (pullChance(serverWorld, 28)) hostileEntity.equipStack(EquipmentSlot.MAINHAND, getRandomEquipmentPiece(serverWorld, EquipmentSlot.MAINHAND, hostileEntity));
                 if (pullChance(serverWorld, 66)) hostileEntity.equipStack(EquipmentSlot.HEAD, getRandomEquipmentPiece(serverWorld, EquipmentSlot.HEAD, hostileEntity));
