@@ -62,12 +62,6 @@ public class MoreBalancedDifficulty implements ModInitializer {
     );
 
     private static final Map<ArmorMaterial, Map<EquipmentSlot, Item>> ARMOR_BY_MATERIAL = Map.of(
-            ArmorMaterials.LEATHER, Map.of(
-                    EquipmentSlot.HEAD, Items.LEATHER_HELMET,
-                    EquipmentSlot.CHEST, Items.LEATHER_CHESTPLATE,
-                    EquipmentSlot.LEGS, Items.LEATHER_LEGGINGS,
-                    EquipmentSlot.FEET, Items.LEATHER_BOOTS
-            ),
             ArmorMaterials.IRON, Map.of(
                     EquipmentSlot.HEAD, Items.IRON_HELMET,
                     EquipmentSlot.CHEST, Items.IRON_CHESTPLATE,
@@ -166,12 +160,10 @@ public class MoreBalancedDifficulty implements ModInitializer {
         if (slot != EquipmentSlot.MAINHAND){
             ArmorMaterial material;
 
-            if (pullChance(world, 1)) material = ArmorMaterials.NETHERITE;
-            else if (pullChance(world, 3)) material = ArmorMaterials.DIAMOND;
-            else if (pullChance(world, 20)) material = ArmorMaterials.GOLD;
-            else if (pullChance(world, 36)) material = ArmorMaterials.COPPER;
-            else if (pullChance(world, 43)) material = ArmorMaterials.LEATHER;
-            else material = ArmorMaterials.IRON;
+            if (pullChance(world, 50)) material = ArmorMaterials.IRON;
+            else if (pullChance(world, 48)) material = ArmorMaterials.CHAIN;
+            else if (pullChance(world, 13)) material = ArmorMaterials.GOLD;
+            else material = ArmorMaterials.DIAMOND;
 
             ItemStack armorPiece = ARMOR_BY_MATERIAL.get(material).get(slot).getDefaultStack();
 
@@ -192,7 +184,11 @@ public class MoreBalancedDifficulty implements ModInitializer {
         }
         else {
             ToolMaterial material;
-            TagKey<Item> mainHandItemTag = hostileEntity.getMainHandStack().streamTags().filter(ENCHANTMENT_BY_WEAPON::containsKey).toList().getFirst();
+            List<TagKey<Item>> mainHandItemTags = hostileEntity.getMainHandStack().streamTags().filter(ENCHANTMENT_BY_WEAPON::containsKey).toList();
+
+            if (mainHandItemTags.isEmpty()) return ItemStack.EMPTY;
+
+            TagKey<Item> mainHandItemTag = mainHandItemTags.getFirst();
 
             if (pullChance(world, 1)) material = ToolMaterial.NETHERITE;
             else if (pullChance(world, 3)) material = ToolMaterial.DIAMOND;
@@ -230,7 +226,11 @@ public class MoreBalancedDifficulty implements ModInitializer {
                 hostileEntity.setEquipmentDropChance(EquipmentSlot.FEET, 0);
 
                 if (hostileEntity.getMainHandStack().streamTags().anyMatch(ENCHANTMENT_BY_WEAPON::containsKey)){
-                    TagKey<Item> mainHandItemTag = hostileEntity.getMainHandStack().streamTags().filter(ENCHANTMENT_BY_WEAPON::containsKey).toList().getFirst();
+                    List<TagKey<Item>> mainHandItemTags = hostileEntity.getMainHandStack().streamTags().filter(ENCHANTMENT_BY_WEAPON::containsKey).toList();
+
+                    if (mainHandItemTags.isEmpty()) return;
+
+                    TagKey<Item> mainHandItemTag = mainHandItemTags.getFirst();
 
                     if (pullChance(serverWorld, 15)){
                         float enchantChance = 25;
